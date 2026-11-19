@@ -74,7 +74,7 @@ const tipos = [
     </div>
   </form>
 
-  <section class="resultado" aria-label="Resultado">
+  <section class="resultado" id="resultado" aria-label="Resultado">
     <div id="r-vacio" class="resultado__vacio" aria-live="polite">
       <p class="resultado__vacio-titulo" id="r-vacio-titulo">Tu resultado aparecerá aquí</p>
       <p class="resultado__vacio-texto" id="r-vacio-texto">Introduce tu salario y las fechas del contrato.</p>
@@ -121,6 +121,18 @@ const tipos = [
   </section>
 </div>
 
+<!-- Solo en pantallas estrechas: mantiene a la vista el importe mientras se rellena el formulario -->
+<a class="barra-resultado" id="barra" href="#resultado" hidden>
+  <span class="barra-resultado__texto">
+    <span class="barra-resultado__label">Indemnización estimada</span>
+    <span class="barra-resultado__total" id="barra-total"></span>
+  </span>
+  <span class="barra-resultado__accion">
+    Ver desglose
+    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"></path></svg>
+  </span>
+</a>
+
 <script>
   import {
     calcularIndemnizacion,
@@ -148,7 +160,21 @@ const tipos = [
     inputFin.value = `${hoy.getFullYear()}-${p(hoy.getMonth() + 1)}-${p(hoy.getDate())}`;
   }
 
+  // Barra de resultado: visible si hay resultado y el panel aún está por debajo de la pantalla
+  const barra = $('barra');
+  let hayResultado = false;
+  let panelAbajo = false;
+  const refrescarBarra = () => {
+    barra.hidden = !(hayResultado && panelAbajo);
+  };
+  new IntersectionObserver(([e]) => {
+    panelAbajo = !e.isIntersecting && e.boundingClientRect.top > 0;
+    refrescarBarra();
+  }).observe($('resultado'));
+
   function mostrarVacio(titulo: string, texto: string, esError: boolean) {
+    hayResultado = false;
+    refrescarBarra();
     $('r-vacio-titulo').textContent = titulo;
     $('r-vacio-texto').textContent = texto;
     $('r-vacio').classList.toggle('resultado__vacio--error', esError);
@@ -197,6 +223,9 @@ const tipos = [
     const r = calcularIndemnizacion({ salarioAnual, inicio, fin, tipo, pactado });
 
     $('r-total').textContent = eur.format(r.indemnizacion);
+    $('barra-total').textContent = eur.format(r.indemnizacion);
+    hayResultado = true;
+    refrescarBarra();
     $('r-dias').textContent = `${num.format(r.indemnizacion / r.salarioDiario)} días`;
     $('r-meses').textContent = `${r.mesesTotales} ${r.mesesTotales === 1 ? 'mes' : 'meses'}`;
     $('r-diario').textContent = eur.format(r.salarioDiario);
