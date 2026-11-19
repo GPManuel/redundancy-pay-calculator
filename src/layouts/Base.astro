@@ -33,6 +33,8 @@ const nav = [
     <meta property="og:url" content={canonical} />
     <meta property="og:locale" content="es_ES" />
     <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
+    <link rel="apple-touch-icon" sizes="180x180" href={`${base}/apple-touch-icon.png`} />
+    <meta name="theme-color" content="#0f6e6e" />
     <script is:inline>
       // Aplica el tema elegido antes de pintar, para evitar un parpadeo
       try {
@@ -52,9 +54,13 @@ const nav = [
       <div class="contenedor site-header__inner">
         <a href={`${base}/`} class="marca">
           <span class="marca__logo" aria-hidden="true">
-            <svg width="20" height="20" viewBox="8 8 16 16">
-              <rect x="8" y="10.5" width="16" height="4" rx="2" fill="#fff"></rect>
-              <rect x="8" y="17.5" width="16" height="4" rx="2" fill="#ffb38a"></rect>
+            <svg width="34" height="34" viewBox="0 0 32 32">
+              <rect width="32" height="32" rx="7" fill="#0f6e6e"></rect>
+              <rect x="7" y="4" width="18" height="24" rx="3.5" fill="#fff"></rect>
+              <rect x="10" y="7" width="12" height="5.5" rx="1.5" fill="#10292b"></rect>
+              <rect x="15.5" y="8.9" width="5" height="1.7" rx=".85" fill="#ffb38a"></rect>
+              <path d="M19.6 17A4.6 4.6 0 1 0 19.6 24" fill="none" stroke="#0f6e6e" stroke-width="2.2" stroke-linecap="round"></path>
+              <path d="M10.6 19.4h6M10.6 21.6h6" fill="none" stroke="#0f6e6e" stroke-width="1.8" stroke-linecap="round"></path>
             </svg>
           </span>
           <span class="marca__nombre">Calculadora de indemnización</span>
