@@ -1,0 +1,120 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const path = Astro.url.pathname.replace(/\/$/, '');
+
+const nav = [
+  { href: `${base}/`, label: 'Calculadora', activo: path === base },
+  { href: `${base}/como-se-calcula/`, label: 'Cómo se calcula', activo: path === `${base}/como-se-calcula` },
+  { href: `${base}/antes-de-firmar/`, label: 'Antes de firmar', activo: path === `${base}/antes-de-firmar` },
+  { href: `${base}/como-se-calcula/#faq`, label: 'Preguntas frecuentes', activo: false },
+];
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content="es_ES" />
+    <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
+    <script is:inline>
+      // Aplica el tema elegido antes de pintar, para evitar un parpadeo
+      try {
+        const t = localStorage.getItem('tema');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch {}
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+    />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="contenedor site-header__inner">
+        <a href={`${base}/`} class="marca">
+          <span class="marca__logo" aria-hidden="true">
+            <svg width="20" height="20" viewBox="8 8 16 16">
+              <rect x="8" y="10.5" width="16" height="4" rx="2" fill="#fff"></rect>
+              <rect x="8" y="17.5" width="16" height="4" rx="2" fill="#ffb38a"></rect>
+            </svg>
+          </span>
+          <span class="marca__nombre">Calculadora de indemnización</span>
+        </a>
+        <div class="nav-zona">
+          <nav aria-label="Principal" class="nav">
+            {
+              nav.map((item) => (
+                <a href={item.href} aria-current={item.activo ? 'page' : undefined}>
+                  {item.label}
+                </a>
+              ))
+            }
+          </nav>
+          <button type="button" class="tema" id="tema" aria-label="Cambiar a tema oscuro" title="Cambiar a tema oscuro">
+            <svg class="tema__luna" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+            </svg>
+            <svg class="tema__sol" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <slot />
+
+    <footer class="site-footer">
+      <div class="contenedor">
+        Cálculo orientativo según los arts. 51, 53 y 56 del Estatuto de los Trabajadores y la Ley 3/2012. No sustituye el
+        asesoramiento de tu sindicato ni de un profesional. <a href={`${base}/antes-de-firmar/`}>Antes de firmar, lee esto</a>.
+      </div>
+    </footer>
+
+    <script>
+      const raiz = document.documentElement;
+      const boton = document.getElementById('tema') as HTMLButtonElement;
+      const sistemaOscuro = window.matchMedia('(prefers-color-scheme: dark)');
+
+      const temaActual = () => raiz.dataset.theme ?? (sistemaOscuro.matches ? 'dark' : 'light');
+
+      function etiquetar() {
+        const texto = temaActual() === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro';
+        boton.setAttribute('aria-label', texto);
+        boton.title = texto;
+      }
+
+      boton.addEventListener('click', () => {
+        const nuevo = temaActual() === 'dark' ? 'light' : 'dark';
+        raiz.dataset.theme = nuevo;
+        try {
+          localStorage.setItem('tema', nuevo);
+        } catch {}
+        etiquetar();
+      });
+
+      sistemaOscuro.addEventListener('change', etiquetar);
+      etiquetar();
+    </script>
+  </body>
+</html>

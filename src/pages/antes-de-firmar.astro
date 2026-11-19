@@ -1,0 +1,131 @@
+---
+import Base from '../layouts/Base.astro';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<Base
+  title="Antes de firmar: consejos si estás pasando por un despido"
+  description="Por qué apoyarte en tu sindicato, la importancia de tener representación de los trabajadores y qué tener en cuenta si te enfrentas a un ERE."
+>
+  <main class="guia">
+    <div>
+      <p class="antetitulo">Si estás pasando por un despido</p>
+      <h1 class="titulo">Antes de firmar</h1>
+      <p class="entradilla">
+        La calculadora te da una cifra orientativa. Lo que acabes cobrando depende también de quién te asesore y de quién negocie por
+        ti. Estas reflexiones son de alguien que ya ha pasado por ello.
+      </p>
+      <nav aria-label="En esta página" class="indice">
+        <a href="#sindicato">Tu sindicato</a>
+        <a href="#representacion">Representación en la empresa</a>
+        <a href="#ere">Si estás en un ERE</a>
+        <a href="#experiencia">El ERE de AIDA</a>
+      </nav>
+    </div>
+
+    <section id="sindicato">
+      <h2>1. Apóyate en tu sindicato</h2>
+      <p class="texto">
+        <strong>Sea cual sea tu despido</strong> (objetivo, disciplinario, improcedente o colectivo), acude a un sindicato antes de firmar
+        nada. Te ayudará a empezar el proceso con garantías, revisará cada detalle de tu caso y defenderá tus intereses, no los de nadie más.
+      </p>
+      <p class="texto">
+        No esperes a que la situación se complique: cuanto antes te asesores, más opciones tendrás. Los plazos para reclamar un despido
+        son cortos.
+      </p>
+      <div class="destacado">
+        <p>
+          <strong>Esta web solo ofrece información orientativa.</strong> No conoce tu convenio, tus nóminas ni las circunstancias de tu despido.
+          Úsala para hacerte una idea, no para decidir.
+        </p>
+      </div>
+    </section>
+
+    <section id="representacion">
+      <h2>2. Constituye una representación antes de necesitarla</h2>
+      <p class="texto">
+        Tener representación de los trabajadores en la empresa es esencial. Si no la tienes, descubrirás su importancia justo cuando
+        necesites mediación y el respaldo de alguien cuyo interés sea defender tus derechos.
+      </p>
+      <p class="texto">
+        Da igual lo buena que sea tu relación con la empresa o con sus directivos: como trabajador, necesitas esta protección. Mientras
+        haya buena fe, las relaciones seguirán siendo fluidas y todo continuará igual. Pero si hay un abuso, la representación es tu
+        herramienta para protegerte y, como mínimo, defender lo que legalmente te corresponde.
+      </p>
+    </section>
+
+    <section id="ere">
+      <h2>3. Si estás en un ERE</h2>
+      <p class="texto">
+        Un ERE es uno de los momentos en los que más se echa de menos haber constituido una representación respaldada por un sindicato.
+        La empresa abre un periodo de consultas, de hasta 30 días (15 en empresas de menos de 50 trabajadores), y en él se negocian las
+        condiciones de salida.
+      </p>
+      <p class="texto">
+        <strong>Si en tu empresa no hay representación</strong>, la plantilla tendrá que formar una comisión de hasta tres personas cuando
+        se anuncie el ERE. Hay dos opciones:
+      </p>
+      <div class="mini-grid">
+        <div class="mini mini--recomendado">
+          <p>Comisión sindical <span class="etiqueta">Recomendada</span></p>
+          <p>Personas designadas por los sindicatos más representativos del sector. Llegan con experiencia en negociar ERE.</p>
+        </div>
+        <div class="mini">
+          <p>Comisión de trabajadores</p>
+          <p>
+            Tres compañeros elegidos entre la plantilla. Conocen la empresa, pero muchas veces no tienen experiencia negociando. Pueden
+            contratar un despacho de abogados, que se persona en la negociación junto a ellos.
+          </p>
+        </div>
+      </div>
+      <p class="texto">
+        Aquí es fácil cometer uno de los errores que más caro le pueden salir a una plantilla: <strong>apoyar la negociación en un despacho
+        de abogados privado sin saber cuáles son sus intereses</strong>.
+      </p>
+    </section>
+
+    <section id="experiencia">
+      <h2>Una experiencia real: el ERE de AIDA en 2026</h2>
+      <figure class="testimonio">
+        <blockquote>
+          <p>
+            Durante los 30 días de negociación del ERE de AIDA, la empresa se mostró beligerante y sin ánimo de ceder en nada. El despacho de abogados
+            que habíamos contratado nos decía que los motivos que alegaba la empresa no se sostenían. Teníamos mimbres de sobra para no
+            firmar ningún acuerdo y demandar al final del proceso, para exigir las condiciones de un despido improcedente o incluso la
+            nulidad del ERE.
+          </p>
+          <p>
+            El último día de negociación, el discurso del despacho de abogados cambió por completo. Gran parte de lo que cobraba
+            dependía de que hubiera acuerdo, y acabó convenciéndonos de firmar uno por debajo de las condiciones que esperábamos.
+          </p>
+        </blockquote>
+        <figcaption>Testimonio anónimo de una persona afectada por el ERE de AIDA (2026)</figcaption>
+      </figure>
+
+      <div class="leccion">
+        <p class="leccion__titulo">La lección</p>
+        <ul>
+          <li>Pregunta siempre <strong>cómo cobra</strong> quien te asesora o negocia por ti. Si gana más cuando hay acuerdo, su consejo puede no ser el tuyo.</li>
+          <li>Un sindicato no cobra por cerrar un acuerdo: su interés es defender los derechos de la plantilla.</li>
+          <li>
+            Si te proponen firmar un acuerdo por debajo de las condiciones de un despido improcedente, <strong>no firmes con dudas sobre
+            los motivos</strong>. Pide que te expliquen, con argumentos, qué ganas firmando y qué arriesgas si no lo haces. Que no te
+            quede la duda de si el consejo pensaba en tus intereses o en los de quien te asesora.
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="cta" aria-label="Volver a la calculadora">
+      <div>
+        <p class="cta__titulo">Calcula tu indemnización</p>
+        <p class="cta__texto">Y lleva la cifra a tu sindicato para revisarla con tu caso concreto.</p>
+      </div>
+      <a class="boton" href={`${base}/`}>
+        Ir a la calculadora
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+      </a>
+    </section>
+  </main>
+</Base>

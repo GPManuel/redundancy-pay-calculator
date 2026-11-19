@@ -1,0 +1,243 @@
+---
+import { DIAS_MINIMOS_ERE, TOPE_MINIMO_ERE } from '../lib/indemnizacion';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const tipos = [
+  { id: 'objetivo', titulo: 'Objetivo / procedente', sub: '20 días por año · tope de 12 mensualidades' },
+  { id: 'improcedente', titulo: 'Improcedente', sub: '33 días por año · tope de 24 mensualidades' },
+  { id: 'colectivo', titulo: 'Despido colectivo (ERE)', sub: 'Días y tope negociados en el acuerdo' },
+];
+---
+
+<div class="calc-grid">
+  <form id="calc" class="card form" aria-label="Datos del despido" novalidate>
+    <div class="campo">
+      <label for="salario">Salario bruto anual</label>
+      <div class="input-euro">
+        <input id="salario" name="salario" class="input input--grande" type="number" inputmode="decimal" min="0" step="100" placeholder="Ej: 30000" aria-describedby="salario-ayuda" />
+      </div>
+      <span id="salario-ayuda" class="ayuda">Incluye la parte proporcional de las pagas extra.</span>
+    </div>
+
+    <div class="fila">
+      <div class="campo">
+        <label for="inicio">Inicio del contrato</label>
+        <input id="inicio" name="inicio" class="input" type="date" />
+      </div>
+      <div class="campo">
+        <label for="fin">Fecha del despido</label>
+        <input id="fin" name="fin" class="input" type="date" />
+      </div>
+    </div>
+
+    <fieldset class="grupo">
+      <legend>Tipo de despido</legend>
+      {
+        tipos.map((t, i) => (
+          <label class="opcion">
+            <input type="radio" name="tipo" value={t.id} checked={i === 1} />
+            <span class="opcion__radio" aria-hidden="true" />
+            <span class="opcion__texto">
+              <span class="opcion__titulo">{t.titulo}</span>
+              <span class="opcion__sub">{t.sub}</span>
+            </span>
+          </label>
+        ))
+      }
+    </fieldset>
+
+    <div id="pactado" class="pactado" hidden>
+      <div>
+        <p class="pactado__titulo">Condiciones pactadas en el ERE</p>
+        <p class="pactado__ayuda">
+          Consulta el acuerdo firmado. Mínimo legal: {DIAS_MINIMOS_ERE} días por año y tope de {TOPE_MINIMO_ERE} mensualidades.
+        </p>
+      </div>
+      <div class="fila">
+        <div class="campo">
+          <label for="dias">Días por año</label>
+          <input id="dias" name="dias" class="input" type="number" inputmode="decimal" min={DIAS_MINIMOS_ERE} step="0.5" value={DIAS_MINIMOS_ERE} />
+        </div>
+        <div class="campo">
+          <label for="tope">Tope en mensualidades</label>
+          <input id="tope" name="tope" class="input" type="number" inputmode="numeric" min={TOPE_MINIMO_ERE} step="1" value={TOPE_MINIMO_ERE} />
+        </div>
+      </div>
+      <label class="check">
+        <input id="sinTope" name="sinTope" type="checkbox" />
+        El acuerdo no fija tope
+      </label>
+      <p class="pactado__enlace">
+        ¿Estás negociando un ERE? <a href={`${base}/antes-de-firmar/#ere`}>Lee esto antes de firmar</a>.
+      </p>
+    </div>
+  </form>
+
+  <section class="resultado" aria-label="Resultado">
+    <div id="r-vacio" class="resultado__vacio" aria-live="polite">
+      <p class="resultado__vacio-titulo" id="r-vacio-titulo">Tu resultado aparecerá aquí</p>
+      <p class="resultado__vacio-texto" id="r-vacio-texto">Introduce tu salario y las fechas del contrato.</p>
+    </div>
+
+    <div id="r-ok" class="resultado__ok" hidden>
+      <div aria-live="polite" aria-atomic="true">
+        <p class="resultado__label">Indemnización estimada</p>
+        <p class="resultado__total" id="r-total"></p>
+        <p class="resultado__resumen">
+          Equivale a <strong id="r-dias"></strong> de salario · <strong id="r-meses"></strong> computados
+        </p>
+      </div>
+
+      <div id="r-tope" class="tope">
+        <div class="tope__fila">
+          <span id="r-tope-label"></span>
+          <span id="r-tope-txt"></span>
+        </div>
+        <div class="tope__barra" aria-hidden="true"><div class="tope__relleno" id="r-barra"></div></div>
+        <p class="tope__aviso" id="r-capado" hidden></p>
+      </div>
+      <p class="tope__libre" id="r-libre" hidden>El acuerdo no fija tope: se aplica el importe íntegro.</p>
+
+      <div class="desglose">
+        <p class="desglose__titulo">Desglose</p>
+        <ul class="desglose__lista" id="r-tramos"></ul>
+        <div class="desglose__pie">
+          <span>Salario diario (bruto anual ÷ 365)</span>
+          <span id="r-diario"></span>
+        </div>
+      </div>
+
+      <p class="aviso-sindicato">
+        Este cálculo es orientativo. Antes de firmar nada, consulta con tu sindicato.
+        <a href={`${base}/antes-de-firmar/`}>Por qué es importante</a>
+      </p>
+
+      <a class="boton" href={`${base}/como-se-calcula/`}>
+        Ver cómo se calcula
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+      </a>
+    </div>
+  </section>
+</div>
+
+<script>
+  import {
+    calcularIndemnizacion,
+    compararFechas,
+    parsearFecha,
+    DIAS_MINIMOS_ERE,
+    TOPE_MINIMO_ERE,
+    type CondicionesPactadas,
+    type TipoDespido,
+  } from '../lib/indemnizacion';
+
+  const eur = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
+  const num = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 2 });
+  const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
+
+  const form = $<HTMLFormElement>('calc');
+  const inputFin = $<HTMLInputElement>('fin');
+  const inputTope = $<HTMLInputElement>('tope');
+  const checkSinTope = $<HTMLInputElement>('sinTope');
+
+  // Por defecto, la fecha del despido es hoy
+  if (!inputFin.value) {
+    const hoy = new Date();
+    const p = (n: number) => String(n).padStart(2, '0');
+    inputFin.value = `${hoy.getFullYear()}-${p(hoy.getMonth() + 1)}-${p(hoy.getDate())}`;
+  }
+
+  function mostrarVacio(titulo: string, texto: string, esError: boolean) {
+    $('r-vacio-titulo').textContent = titulo;
+    $('r-vacio-texto').textContent = texto;
+    $('r-vacio').classList.toggle('resultado__vacio--error', esError);
+    $('r-vacio').hidden = false;
+    $('r-ok').hidden = true;
+  }
+
+  function actualizar() {
+    const datos = new FormData(form);
+    const tipo = datos.get('tipo') as TipoDespido;
+    const esEre = tipo === 'colectivo';
+
+    $('pactado').hidden = !esEre;
+    inputTope.disabled = checkSinTope.checked;
+
+    const textoSalario = String(datos.get('salario') ?? '').trim();
+    const salarioAnual = Number(textoSalario);
+    const inicio = parsearFecha(String(datos.get('inicio') ?? ''));
+    const fin = parsearFecha(inputFin.value);
+
+    if (!textoSalario || !inicio || !fin) {
+      return mostrarVacio('Tu resultado aparecerá aquí', 'Introduce tu salario y las fechas del contrato.', false);
+    }
+    if (!(salarioAnual > 0)) return mostrarVacio('Revisa los datos', 'El salario bruto anual debe ser mayor que 0.', true);
+    if (compararFechas(fin, inicio) < 0) {
+      return mostrarVacio('Revisa los datos', 'La fecha del despido no puede ser anterior al inicio del contrato.', true);
+    }
+
+    let pactado: CondicionesPactadas | undefined;
+    if (esEre) {
+      const diasPorAnio = Number(datos.get('dias'));
+      const topeMensualidades = checkSinTope.checked ? null : Number(inputTope.value);
+      if (!(diasPorAnio >= DIAS_MINIMOS_ERE)) {
+        return mostrarVacio('Revisa los datos', `Los días pactados no pueden bajar del mínimo legal de ${DIAS_MINIMOS_ERE} por año.`, true);
+      }
+      if (topeMensualidades !== null && !(topeMensualidades >= TOPE_MINIMO_ERE)) {
+        return mostrarVacio(
+          'Revisa los datos',
+          `El tope pactado no puede bajar de ${TOPE_MINIMO_ERE} mensualidades. Si el acuerdo no fija tope, márcalo.`,
+          true,
+        );
+      }
+      pactado = { diasPorAnio, topeMensualidades };
+    }
+
+    const r = calcularIndemnizacion({ salarioAnual, inicio, fin, tipo, pactado });
+
+    $('r-total').textContent = eur.format(r.indemnizacion);
+    $('r-dias').textContent = `${num.format(r.indemnizacion / r.salarioDiario)} días`;
+    $('r-meses').textContent = `${r.mesesTotales} ${r.mesesTotales === 1 ? 'mes' : 'meses'}`;
+    $('r-diario').textContent = eur.format(r.salarioDiario);
+
+    const conTope = Number.isFinite(r.tope);
+    $('r-tope').hidden = !conTope;
+    $('r-libre').hidden = conTope;
+    if (conTope) {
+      const mensualidades = `${num.format(r.topeMensualidades)} mensualidades`;
+      $('r-tope-label').textContent = `Uso del tope ${esEre ? 'pactado' : 'legal'}`;
+      $('r-tope-txt').textContent = `${mensualidades} · ${eur.format(r.tope)}`;
+      $('r-barra').style.width = `${Math.min(100, (r.importeSinTope / r.tope) * 100)}%`;
+      const capado = $('r-capado');
+      capado.hidden = !r.topeAplicado;
+      capado.textContent = `Se ha aplicado el tope. Sin él serían ${eur.format(r.importeSinTope)}.`;
+    }
+
+    $('r-tramos').replaceChildren(
+      ...r.tramos.map((t) => {
+        const li = document.createElement('li');
+        li.className = 'desglose__item';
+        const izq = document.createElement('span');
+        const nombre = document.createElement('span');
+        nombre.textContent = t.etiqueta;
+        const detalle = document.createElement('span');
+        detalle.className = 'desglose__detalle';
+        detalle.textContent = `${t.meses} meses × ${num.format(t.diasPorAnio)} días/año`;
+        izq.append(nombre, detalle);
+        const der = document.createElement('span');
+        der.textContent = eur.format(t.importe);
+        li.append(izq, der);
+        return li;
+      }),
+    );
+
+    $('r-vacio').hidden = true;
+    $('r-ok').hidden = false;
+  }
+
+  form.addEventListener('input', actualizar);
+  form.addEventListener('change', actualizar);
+  form.addEventListener('submit', (e) => e.preventDefault());
+  actualizar();
+</script>

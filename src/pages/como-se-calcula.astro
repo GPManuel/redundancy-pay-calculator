@@ -1,0 +1,201 @@
+---
+import Base from '../layouts/Base.astro';
+import { calcularIndemnizacion, DIAS_MINIMOS_ERE, TOPE_MINIMO_ERE, type Fecha } from '../lib/indemnizacion';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const eur = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
+const num = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 2 });
+const fmtFecha = (f: Fecha) => `${String(f.dia).padStart(2, '0')}/${String(f.mes).padStart(2, '0')}/${f.anio}`;
+
+// Ejemplo calculado con la misma fórmula que la calculadora
+const ejemplo = { salarioAnual: 30000, inicio: { anio: 2014, mes: 3, dia: 10 }, fin: { anio: 2026, mes: 11, dia: 15 } };
+const r = calcularIndemnizacion({ ...ejemplo, tipo: 'improcedente' });
+const diasIndemnizacion = (33 / 12) * r.mesesTotales;
+const anios = Math.floor(r.mesesTotales / 12);
+const mesesSueltos = r.mesesTotales % 12;
+
+const faqs = [
+  { p: '¿Uso el salario bruto o el neto?', r: 'El bruto anual, incluyendo la parte proporcional de las pagas extra.' },
+  { p: '¿Cuentan los meses que no he completado?', r: 'Sí. Cualquier mes empezado se cuenta como un mes completo.' },
+  {
+    p: '¿Y si es un despido disciplinario declarado procedente?',
+    r: 'En ese caso no hay indemnización. Si el juzgado lo declara improcedente, se aplican los 33 días por año.',
+  },
+  {
+    p: '¿Tengo que pagar IRPF por la indemnización?',
+    r: 'Está exenta hasta la cuantía obligatoria que fija la ley, con un máximo de 180.000 €. Lo que se cobre por encima, por ejemplo por un pacto, puede tributar. Consúltalo con un asesor.',
+  },
+  {
+    p: '¿Cuánto tiempo tengo para reclamar?',
+    r: '20 días hábiles desde la fecha del despido para impugnarlo. Acude a tu sindicato cuanto antes para no perder el plazo.',
+  },
+  {
+    p: '¿Quién me puede asesorar?',
+    r: 'Tu sindicato, sea cual sea el tipo de despido. Te ayudará a revisar la carta de despido, el cálculo y cualquier acuerdo antes de firmarlo.',
+  },
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.p, acceptedAnswer: { '@type': 'Answer', text: f.r } })),
+};
+---
+
+<Base
+  title="Cómo se calcula la indemnización por despido"
+  description="Fórmula paso a paso de la indemnización por despido en España: días por año, topes, contratos anteriores a 2012, ERE y un ejemplo resuelto."
+>
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+
+  <main class="guia">
+    <div>
+      <p class="antetitulo">Guía</p>
+      <h1 class="titulo">Cómo se calcula tu indemnización por despido</h1>
+      <p class="entradilla">
+        Tres datos deciden la cifra: tu salario, el tiempo que has trabajado y el tipo de despido. Aquí tienes la fórmula paso a paso,
+        con sus topes y excepciones.
+      </p>
+      <nav aria-label="En esta página" class="indice">
+        <a href="#formula">La fórmula</a>
+        <a href="#tipos">Días y topes</a>
+        <a href="#antes-2012">Contratos antes de 2012</a>
+        <a href="#ere">ERE</a>
+        <a href="#ejemplo">Ejemplo</a>
+        <a href="#faq">Preguntas</a>
+      </nav>
+    </div>
+
+    <div class="destacado">
+      <p>
+        <strong>Sea cual sea tu despido, consulta con tu sindicato antes de firmar nada.</strong> Esta guía explica la fórmula general,
+        pero tu caso puede tener matices que cambien la cifra. <a href={`${base}/antes-de-firmar/`}>Por qué es importante</a>.
+      </p>
+    </div>
+
+    <section id="formula">
+      <h2>1. La fórmula</h2>
+      <div class="card formula">
+        <div class="formula__bloque"><p>Salario diario</p><p>bruto anual ÷ 365</p></div>
+        <span class="formula__op" aria-hidden="true">×</span>
+        <div class="formula__bloque"><p>Días por año ÷ 12</p><p>según el tipo</p></div>
+        <span class="formula__op" aria-hidden="true">×</span>
+        <div class="formula__bloque"><p>Meses trabajados</p><p>mes empezado = mes</p></div>
+        <span class="formula__op" aria-hidden="true">=</span>
+        <div class="formula__bloque formula__bloque--total"><p>Indemnización</p><p>hasta el tope</p></div>
+      </div>
+      <p class="texto">
+        Se trabaja por meses, no por años: cada mes empezado cuenta como un mes entero. Si el resultado supera el tope del tipo de
+        despido, se cobra el tope.
+      </p>
+    </section>
+
+    <section id="tipos">
+      <h2>2. Días y topes por tipo de despido</h2>
+      <div class="tabla-scroll">
+        <table class="tabla">
+          <thead>
+            <tr><th scope="col">Tipo</th><th scope="col">Días por año</th><th scope="col">Tope</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Objetivo / procedente</th><td>20</td><td>12 mensualidades</td></tr>
+            <tr><th scope="row">Improcedente</th><td>33</td><td>24 mensualidades</td></tr>
+            <tr>
+              <th scope="row">Improcedente, contrato anterior al 12/02/2012</th>
+              <td>45 hasta esa fecha, 33 después</td>
+              <td>24, o hasta 42 mensualidades</td>
+            </tr>
+            <tr>
+              <th scope="row">Despido colectivo (ERE)</th>
+              <td>Pactado, mínimo {DIAS_MINIMOS_ERE}</td>
+              <td>Pactado, mínimo {TOPE_MINIMO_ERE}, o sin tope</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="antes-2012">
+      <h2>3. Si tu contrato empezó antes del 12/02/2012</h2>
+      <p class="texto">
+        La reforma laboral de 2012 rebajó el despido improcedente de 45 a 33 días por año. Si ya trabajabas antes, tu antigüedad se
+        divide en dos tramos y cada uno se calcula con su regla.
+      </p>
+      <div class="card tramos">
+        <div class="tramos__barra">
+          <div class="tramos__tramo tramos__tramo--antes"><strong>45 días por año</strong><span>hasta el 11/02/2012</span></div>
+          <div class="tramos__tramo tramos__tramo--despues"><strong>33 días por año</strong><span>desde el 12/02/2012</span></div>
+        </div>
+        <div class="tramos__ejes"><span>Inicio del contrato</span><span>Fecha del despido</span></div>
+      </div>
+      <p class="texto">
+        <strong>El tope:</strong> 24 mensualidades en general. Si solo el primer tramo ya supera esa cifra, se respeta lo generado en ese
+        tramo, con un máximo de 42 mensualidades.
+      </p>
+      <p class="texto">En el despido objetivo y en el ERE la fecha de 2012 no cambia nada: todo el periodo se calcula con la misma regla.</p>
+    </section>
+
+    <section id="ere">
+      <h2>4. Despido colectivo (ERE)</h2>
+      <p class="texto">
+        En un ERE la empresa y la representación de los trabajadores negocian las condiciones. El acuerdo puede mejorar la ley, pero
+        nunca quedar por debajo del mínimo: <strong>{DIAS_MINIMOS_ERE} días por año con tope de {TOPE_MINIMO_ERE} mensualidades</strong>.
+      </p>
+      <div class="mini-grid">
+        <div class="mini"><p>Días por año</p><p>Lo pactado: {DIAS_MINIMOS_ERE} o más, a veces con decimales.</p></div>
+        <div class="mini"><p>Tope</p><p>En mensualidades, {TOPE_MINIMO_ERE} o más. Algunos acuerdos no fijan ninguno.</p></div>
+        <div class="mini"><p>Cantidades fijas</p><p>Si el acuerdo añade un importe por persona, súmalo aparte.</p></div>
+      </div>
+      <p class="texto">
+        Quién negocia por la plantilla importa tanto como la fórmula.
+        <a href={`${base}/antes-de-firmar/#ere`}>Lee esto antes de firmar un acuerdo</a>.
+      </p>
+    </section>
+
+    <section id="ejemplo">
+      <h2>5. Un ejemplo completo</h2>
+      <p class="texto">
+        Salario bruto anual de {eur.format(ejemplo.salarioAnual)}, contrato del {fmtFecha(ejemplo.inicio)} al {fmtFecha(ejemplo.fin)},
+        despido improcedente.
+      </p>
+      <ol class="ejemplo">
+        <li><span><strong>Salario diario</strong> · {eur.format(ejemplo.salarioAnual)} ÷ 365</span><span>{eur.format(r.salarioDiario)}</span></li>
+        <li>
+          <span><strong>Meses trabajados</strong> · {anios} años y {mesesSueltos} meses, contando el mes empezado</span>
+          <span>{r.mesesTotales} meses</span>
+        </li>
+        <li><span><strong>Días de indemnización</strong> · 33 ÷ 12 × {r.mesesTotales}</span><span>{num.format(diasIndemnizacion)} días</span></li>
+        <li>
+          <span><strong>Tope</strong> · 24 × {eur.format(r.salarioMensual)}, {r.topeAplicado ? 'se aplica' : 'no se alcanza'}</span>
+          <span>{eur.format(r.tope)}</span>
+        </li>
+        <li class="ejemplo__total"><span><strong>Indemnización</strong></span><span>{eur.format(r.indemnizacion)}</span></li>
+      </ol>
+    </section>
+
+    <section id="faq">
+      <h2>Preguntas frecuentes</h2>
+      <div class="faq">
+        {
+          faqs.map((f) => (
+            <details>
+              <summary>{f.p}</summary>
+              <p>{f.r}</p>
+            </details>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="cta" aria-label="Calcula la tuya">
+      <div>
+        <p class="cta__titulo">Calcula la tuya en un minuto</p>
+        <p class="cta__texto">Con desglose por tramos. Después, revisa la cifra con tu sindicato.</p>
+      </div>
+      <a class="boton" href={`${base}/`}>
+        Ir a la calculadora
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+      </a>
+    </section>
+  </main>
+</Base>

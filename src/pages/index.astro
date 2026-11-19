@@ -1,0 +1,37 @@
+---
+import Base from '../layouts/Base.astro';
+import Calculadora from '../components/Calculadora.astro';
+---
+
+<Base
+  title="Calculadora de indemnización por despido"
+  description="Calcula gratis tu indemnización por despido objetivo, improcedente o ERE en España, incluidos los contratos anteriores a la reforma de 2012."
+>
+  <main class="contenedor calc-page">
+    <div class="calc-intro">
+      <p class="antetitulo">Estatuto de los Trabajadores</p>
+      <h1 class="titulo">¿Cuánto te corresponde por tu despido?</h1>
+      <p class="entradilla">Introduce tu salario y tus fechas. El resultado se actualiza al momento y te muestra el desglose completo.</p>
+    </div>
+
+    <Calculadora />
+
+    <section class="reglas" aria-label="Reglas básicas">
+      <div class="regla">
+        <p class="regla__tipo">Objetivo / procedente</p>
+        <p class="regla__cifra">20 días <span>por año</span></p>
+        <p class="regla__nota">Tope de 12 mensualidades.</p>
+      </div>
+      <div class="regla">
+        <p class="regla__tipo">Improcedente</p>
+        <p class="regla__cifra">33 días <span>por año</span></p>
+        <p class="regla__nota">Tope de 24 mensualidades. Antes del 12/02/2012, 45 días por año.</p>
+      </div>
+      <div class="regla">
+        <p class="regla__tipo">Despido colectivo (ERE)</p>
+        <p class="regla__cifra">Negociable</p>
+        <p class="regla__nota">Nunca por debajo de 20 días por año y 12 mensualidades.</p>
+      </div>
+    </section>
+  </main>
+</Base>
