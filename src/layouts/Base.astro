@@ -1,14 +1,21 @@
 ---
+import '@fontsource-variable/inter/wght.css';
+import '@fontsource-variable/space-grotesk/wght.css';
 import '../styles/global.css';
+import { NOMBRE_SITIO, REVISION } from '../lib/sitio';
 
 interface Props {
   title: string;
   description: string;
+  /** Páginas que no deben aparecer en buscadores (p. ej. la 404). */
+  noindex?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, noindex = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const imagen = new URL(`${base}/og-image.png`, Astro.site);
+const imagenAlt = 'Calculadora de indemnización por despido: icono de calculadora con el símbolo del euro';
 const path = Astro.url.pathname.replace(/\/$/, '');
 
 const nav = [
@@ -32,6 +39,16 @@ const nav = [
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:locale" content="es_ES" />
+    <meta property="og:site_name" content={NOMBRE_SITIO} />
+    <meta property="og:image" content={imagen} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={imagenAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imagen} />
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
     <link rel="apple-touch-icon" sizes="180x180" href={`${base}/apple-touch-icon.png`} />
     <meta name="theme-color" content="#0f6e6e" />
@@ -42,12 +59,6 @@ const nav = [
         if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
       } catch {}
     </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
-    />
   </head>
   <body>
     <header class="site-header">
@@ -94,6 +105,10 @@ const nav = [
       <div class="contenedor">
         Cálculo orientativo según los arts. 51, 53 y 56 del Estatuto de los Trabajadores y la Ley 3/2012. No sustituye el
         asesoramiento de tu sindicato ni de un profesional. <a href={`${base}/antes-de-firmar/`}>Antes de firmar, lee esto</a>.
+      </div>
+      <div class="contenedor site-footer__meta">
+        Contenido revisado en <time datetime={REVISION.iso}>{REVISION.texto}</time>. Fuentes:
+        <a href={`${base}/como-se-calcula/#fuentes`}>normativa oficial</a>.
       </div>
     </footer>
 

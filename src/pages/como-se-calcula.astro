@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import { calcularIndemnizacion, DIAS_MINIMOS_ERE, TOPE_MINIMO_ERE, type Fecha } from '../lib/indemnizacion';
+import { FUENTES, REVISION } from '../lib/sitio';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const eur = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
@@ -56,6 +57,7 @@ const faqJsonLd = {
         Tres datos deciden la cifra: tu salario, el tiempo que has trabajado y el tipo de despido. Aquí tienes la fórmula paso a paso,
         con sus topes y excepciones.
       </p>
+      <p class="revision">Revisado en <time datetime={REVISION.iso}>{REVISION.texto}</time> · <a href="#fuentes">Fuentes oficiales</a></p>
       <nav aria-label="En esta página" class="indice">
         <a href="#formula">La fórmula</a>
         <a href="#tipos">Días y topes</a>
@@ -63,6 +65,7 @@ const faqJsonLd = {
         <a href="#ere">ERE</a>
         <a href="#ejemplo">Ejemplo</a>
         <a href="#faq">Preguntas</a>
+        <a href="#fuentes">Fuentes</a>
       </nav>
     </div>
 
@@ -185,6 +188,27 @@ const faqJsonLd = {
           ))
         }
       </div>
+    </section>
+
+    <section id="fuentes">
+      <h2>Fuentes oficiales</h2>
+      <p class="texto">
+        Las reglas de esta página salen de la normativa vigente. Puedes comprobarlas en el BOE, y conviene hacerlo: las leyes cambian y
+        tu convenio colectivo puede mejorar estas cifras.
+      </p>
+      <ul class="fuentes">
+        {
+          FUENTES.map((f) => (
+            <li>
+              <a href={f.url} rel="noopener" target="_blank">
+                {f.nombre}
+              </a>
+              <span>{f.detalle}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="texto">Última revisión del contenido: <time datetime={REVISION.iso}>{REVISION.texto}</time>.</p>
     </section>
 
     <section class="cta" aria-label="Calcula la tuya">

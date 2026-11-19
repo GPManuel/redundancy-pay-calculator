@@ -1,0 +1,30 @@
+---
+import Base from '../layouts/Base.astro';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<Base title="Página no encontrada · Calculadora de indemnización" description="La página que buscas no existe." noindex>
+  <main class="guia">
+    <div>
+      <p class="antetitulo">Error 404</p>
+      <h1 class="titulo">No encontramos esta página</h1>
+      <p class="entradilla">El enlace puede estar mal escrito o la página haber cambiado de sitio. Estas son las secciones de la web:</p>
+    </div>
+
+    <div class="mini-grid">
+      <a class="mini mini--enlace" href={`${base}/`}>
+        <p>Calculadora</p>
+        <p>Calcula tu indemnización por despido.</p>
+      </a>
+      <a class="mini mini--enlace" href={`${base}/como-se-calcula/`}>
+        <p>Cómo se calcula</p>
+        <p>La fórmula, los topes y un ejemplo resuelto.</p>
+      </a>
+      <a class="mini mini--enlace" href={`${base}/antes-de-firmar/`}>
+        <p>Antes de firmar</p>
+        <p>Qué tener en cuenta si te enfrentas a un despido.</p>
+      </a>
+    </div>
+  </main>
+</Base>

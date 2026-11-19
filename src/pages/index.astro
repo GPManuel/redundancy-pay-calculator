@@ -1,12 +1,31 @@
 ---
 import Base from '../layouts/Base.astro';
 import Calculadora from '../components/Calculadora.astro';
+import { NOMBRE_SITIO } from '../lib/sitio';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const aplicacionJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: NOMBRE_SITIO,
+  url: new URL(`${base}/`, Astro.site).href,
+  applicationCategory: 'FinanceApplication',
+  operatingSystem: 'Cualquiera (navegador web)',
+  inLanguage: 'es-ES',
+  isAccessibleForFree: true,
+  description:
+    'Calcula la indemnización por despido objetivo, improcedente o colectivo (ERE) en España, incluidos los contratos anteriores a la reforma de 2012.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+};
 ---
 
 <Base
   title="Calculadora de indemnización por despido"
   description="Calcula gratis tu indemnización por despido objetivo, improcedente o ERE en España, incluidos los contratos anteriores a la reforma de 2012."
 >
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(aplicacionJsonLd)} />
+
   <main class="contenedor calc-page">
     <div class="calc-intro">
       <p class="antetitulo">Estatuto de los Trabajadores</p>
