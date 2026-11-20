@@ -2,10 +2,9 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
-// GitHub Pages: https://gpmanuel.github.io/redundancy-pay-calculator/
-// Con dominio propio: cambia `site` por 'https://tudominio.es' y borra `base`.
+// Alojada en Cloudflare Pages: https://calculadora-despido.pages.dev/
+// Con dominio propio: cambia `site` por 'https://tudominio.es'. Nada más.
 export default defineConfig({
-  site: 'https://gpmanuel.github.io',
-  base: '/redundancy-pay-calculator',
+  site: 'https://calculadora-despido.pages.dev',
   integrations: [sitemap()],
 });

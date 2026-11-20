@@ -6,7 +6,7 @@ Web estática (Astro + TypeScript) que estima la indemnización por despido obje
 
 ```bash
 npm install
-npm run dev      # servidor local en http://localhost:4321/redundancy-pay-calculator
+npm run dev      # servidor local en http://localhost:4321
 npm test         # tests de la fórmula (Vitest)
 npm run build    # comprobación de tipos + build estático en dist/
 npm run preview  # sirve dist/ en local
@@ -20,7 +20,23 @@ npm run preview  # sirve dist/ en local
 - `src/pages/index.astro`: página principal con la calculadora.
 - `src/pages/como-se-calcula.astro`: guía de la fórmula, con un ejemplo calculado al generar la web y preguntas frecuentes.
 - `src/layouts/Base.astro`: cabecera, navegación, pie y metadatos SEO.
-- `.github/workflows/deploy.yml`: despliegue automático a GitHub Pages al hacer push a `main`.
+- `.github/workflows/ci.yml`: ejecuta los tests y el build en cada cambio. No despliega.
+- `.node-version`: versión de Node que usan GitHub Actions y Cloudflare.
+
+## Despliegue (Cloudflare Pages)
+
+La web se publica en https://calculadora-despido.pages.dev/ y se despliega sola con cada cambio en `main`.
+
+Configuración del proyecto en Cloudflare (Workers & Pages → Create → Pages → Connect to Git):
+
+| Campo | Valor |
+|---|---|
+| Production branch | `main` |
+| Framework preset | `Astro` |
+| Build command | `npm run build` |
+| Build output directory | `dist` |
+
+Si se cambia la dirección (por ejemplo, a un dominio propio), basta con actualizar `site` en `astro.config.mjs`: los enlaces, el mapa del sitio, `robots.txt` y las etiquetas para compartir se generan a partir de ese valor.
 
 ## Reglas de cálculo
 
